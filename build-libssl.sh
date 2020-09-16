@@ -52,6 +52,7 @@ echo_help()
   echo "     --noparallel                  Disable running make with parallel jobs (make -j)"
   echo "     --tvos-sdk=SDKVERSION         Override tvOS SDK version"
   echo "     --disable-bitcode             Disable embedding Bitcode"
+  echo "     --disable-download            Disable source download"
   echo " -v, --verbose                     Enable verbose logging"
   echo "     --verbose-on-error            Dump last 500 lines from log file if an error occurs (for Travis builds)"
   echo "     --version=VERSION             OpenSSL version to build (defaults to ${DEFAULTVERSION})"
@@ -190,6 +191,7 @@ BRANCH=""
 CLEANUP=""
 CONFIG_ENABLE_EC_NISTP_64_GCC_128=""
 CONFIG_DISABLE_BITCODE=""
+CONFIG_DISABLE_DOWNLOAD=""
 CONFIG_NO_DEPRECATED=""
 IOS_SDKVERSION=""
 MACOSX_SDKVERSION=""
@@ -222,6 +224,9 @@ case $i in
     ;;
   --disable-bitcode)
     CONFIG_DISABLE_BITCODE="true"
+    ;;
+  --disable-download)
+    CONFIG_DISABLE_DOWNLOAD="true"
     ;;
   -h|--help)
     echo_help
@@ -379,6 +384,12 @@ echo
 OPENSSL_ARCHIVE_BASE_NAME="openssl-${VERSION}"
 OPENSSL_ARCHIVE_FILE_NAME="${OPENSSL_ARCHIVE_BASE_NAME}.tar.gz"
 if [ ! -e ${OPENSSL_ARCHIVE_FILE_NAME} ]; then
+
+  if [ "${CONFIG_DISABLE_DOWNLOAD}" == "true" ]; then
+    echo "${OPENSSL_ARCHIVE_FILE_NAME} is not available and downloading is disabled"
+    exit 1
+  fi
+
   echo "Downloading ${OPENSSL_ARCHIVE_FILE_NAME}..."
   OPENSSL_ARCHIVE_URL="https://www.openssl.org/source/${OPENSSL_ARCHIVE_FILE_NAME}"
 
